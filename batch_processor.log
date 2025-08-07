@@ -1,0 +1,18 @@
+2025-08-07 11:30:54,501 - INFO - Logging configured.
+2025-08-07 11:30:54,660 - INFO - Attempting DMS login for user 'test_user1'...
+2025-08-07 11:30:54,689 - INFO - DMS login successful.
+2025-08-07 11:30:54,690 - INFO - Connecting to Oracle database...
+2025-08-07 11:30:54,822 - INFO - Database connection successful.
+2025-08-07 11:30:54,823 - INFO - Fetching up to 100 documents to process...
+2025-08-07 11:30:54,827 - INFO - Found 1 documents to process.
+2025-08-07 11:30:54,827 - INFO - --- Processing document 1/1: '19660298' ---
+2025-08-07 11:30:55,030 - INFO - Step 1: Calling GetDocSvr3 for doc: '19660298'
+2025-08-07 11:30:55,063 - INFO - Step 1 SUCCESS. contentID: 6f8eaa61-9b13-454a-8c8a-c4ea13e0963d
+2025-08-07 11:30:55,064 - INFO - Step 2: Calling GetReadStream
+2025-08-07 11:30:55,099 - INFO - Step 2 SUCCESS. streamID: c10ed471-c43a-4d38-a069-a71f493bc826
+2025-08-07 11:30:55,101 - INFO - Step 3: Reading stream...
+2025-08-07 11:30:55,154 - INFO - Step 3 SUCCESS. Full document downloaded.
+2025-08-07 11:30:55,171 - INFO - Sending '19660298.JPG' to image processing service...
+2025-08-07 11:31:03,660 - INFO - Successfully received caption and tags.
+2025-08-07 11:31:03,668 - INFO - Successfully updated database for doc '19660298'.
+2025-08-07 11:31:03,674 - INFO - Batch finished. Database changes have been committed.
