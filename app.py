@@ -211,7 +211,7 @@ def main():
                 
                 sql_fetch = f"""
                     SELECT docnumber from profile
-                    WHERE docnumber = 19660298
+                    WHERE docnumber >= 19661457 and FORM = 2740
                     FETCH FIRST {BATCH_SIZE} ROWS ONLY
                 """
                 # logging.info(f"Fetching up to {BATCH_SIZE} documents to process...")
