@@ -23,6 +23,7 @@ DMS_PASSWORD = os.getenv("DMS_PASSWORD")
 
 # Image Captioning API URL
 IMAGE_PROCESSING_URL = os.getenv("IMAGE_PROCESSING_URL")
+IMAGE_OCR_URL = os.getenv("IMAGE_OCR_URL")
 
 # Batch Processing Settings
 BATCH_SIZE = 100 # Number of rows to fetch from Oracle in each run
@@ -175,7 +176,7 @@ def get_caption_and_tags(image_bytes, filename):
         files = {'image_file': (filename, io.BytesIO(image_bytes), 'application/octet-stream')}
         
         response = requests.post(IMAGE_PROCESSING_URL, files=files, timeout=120)
-        
+
         if response.status_code == 200:
             data = response.json()
             caption = data.get('caption')
@@ -191,6 +192,36 @@ def get_caption_and_tags(image_bytes, filename):
     except Exception as e:
         logging.error(f"An unexpected error occurred while calling the image processor: {e}", exc_info=True)
         return None, None
+
+
+def get_ocr(image_bytes, filename):
+    """Sends image bytes to the OCR API and returns the results."""
+    if not image_bytes:
+        logging.warning("Image bytes are empty, cannot process.")
+        return None, None
+    
+    try:
+        # logging.info(f"Sending '{filename}' to image processing service...")
+        files = {'image_file': (filename, io.BytesIO(image_bytes), 'application/octet-stream')}
+        
+        response = requests.post(IMAGE_OCR_URL, files=files, timeout=120)
+
+        if response.status_code == 200:
+            data = response.json()
+            caption = data.get('caption')
+            tags = data.get('tags', [])
+            # logging.info("Successfully received caption and tags.")
+            return caption, tags
+        else:
+            logging.error(f"Image processing service failed with status {response.status_code}: {response.text}")
+            return None, None
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Could not connect to image processing service at {IMAGE_OCR_URL}. Is it running? Error: {e}")
+        return None, None
+    except Exception as e:
+        logging.error(f"An unexpected error occurred while calling the image processor: {e}", exc_info=True)
+        return None, None
+
 
 def main():
     """Main execution function to run the batch process."""
@@ -211,7 +242,7 @@ def main():
                 
                 sql_fetch = f"""
                     SELECT docnumber from profile
-                    WHERE docnumber >= 19661457 and FORM = 2740
+                    WHERE docnumber = 19663313 and FORM = 2740
                     FETCH FIRST {BATCH_SIZE} ROWS ONLY
                 """
                 # logging.info(f"Fetching up to {BATCH_SIZE} documents to process...")
@@ -237,8 +268,14 @@ def main():
                         logging.warning(f"Skipping doc '{doc_number}' due to DMS retrieval failure.")
                         continue
                         
-                    # Get caption and tags from AI service
+                    # Get caption and tags
                     caption, tags = get_caption_and_tags(image_bytes, filename)
+
+                    # Get OCR
+                    ocr_text, _ = get_ocr(image_bytes, filename)
+                    if ocr_text:
+                        caption = f"{caption}, Text: {ocr_text}"
+
                     if not caption:
                         logging.warning(f"Skipping doc '{doc_number}' due to captioning failure.")
                         continue
