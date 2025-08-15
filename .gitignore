@@ -4,4 +4,6 @@
 # Python cache files
 __pycache__/
 *.pyc
+*.log
+/venv/
 batch_processor.log
